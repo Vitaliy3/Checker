@@ -113,8 +113,6 @@ const avatars = [
   "?accessoriesType=Kurt&avatarStyle=Circle&clotheColor=Gray01&clotheType=BlazerShirt&eyeType=Surprised&eyebrowType=Default&facialHairColor=Red&facialHairType=Blank&graphicType=Selena&hairColor=Red&hatColor=Blue02&mouthType=Twinkle&skinColor=Pale&topType=LongHairCurly",
 ];
 
-const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export default {
   data: () => ({
     active: [],
@@ -154,16 +152,37 @@ export default {
   },
 
   methods: {
-    async fetchUsers(item) {
+    fetchUsers() {
       // Remove in 6 months and say
       // you've made optimizations! :)
-      await pause(1500);
 
-      return fetch("https://jsonplaceholder.typicode.com/users")
-        .then((res) => res.json())
-        .then((json) => item.children.push(...json))
-        .catch((err) => console.warn(err));
+      return [
+        {
+          id: 1,
+          name: "Leanne Graham",
+          username: "Bret",
+          email: "Sincere@april.biz",
+          address: {
+            street: "Kulas Light",
+            suite: "Apt. 556",
+            city: "Gwenborough",
+            zipcode: "92998-3874",
+            geo: {
+              lat: "-37.3159",
+              lng: "81.1496",
+            },
+          },
+          phone: "1-770-736-8031 x56442",
+          website: "hildegard.org",
+          company: {
+            name: "Romaguera-Crona",
+            catchPhrase: "Multi-layered client-server neural-net",
+            bs: "harness real-time e-markets",
+          },
+        },
+      ];
     },
+    
     randomAvatar() {
       this.avatar = avatars[Math.floor(Math.random() * avatars.length)];
     },
