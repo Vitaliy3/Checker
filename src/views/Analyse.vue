@@ -26,21 +26,24 @@
       <v-divider vertical></v-divider>
 
       <v-col cols="3">
-        <v-card class="mx-auto" max-width="500" min-height="500" tile>
-          <v-list flat>
-            <v-subheader>REPORTS</v-subheader>
-            <v-list-item-group v-model="selectedItem" color="primary">
-              <v-list-item v-for="(item, i) in tasks" :key="i">
-                <v-list-item-icon>
-                  <v-icon v-text="item.icon"></v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                  <v-list-item-title v-text="item.text"></v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-        </v-card>
+        <div
+          v-if="!selected"
+          class="title grey--text text--lighten-1 font-weight-light"
+          style="align-self: center;"
+        >
+          Select a User
+        </div>
+        <v-list v-else :key="selected.id" flat>
+          <v-subheader>REPORTS</v-subheader>
+          <v-list-item-group v-model="selectedItem" color="primary">
+            <v-list-item v-for="(item, i) in selected.tasks" :key="i">
+              <v-list-item-icon> </v-list-item-icon>
+              <v-list-item-content>
+                <v-list-item-title v-text="item.text"></v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
       </v-col>
 
       <v-divider vertical></v-divider>
@@ -113,6 +116,8 @@ const avatars = [
   "?accessoriesType=Kurt&avatarStyle=Circle&clotheColor=Gray01&clotheType=BlazerShirt&eyeType=Surprised&eyebrowType=Default&facialHairColor=Red&facialHairType=Blank&graphicType=Selena&hairColor=Red&hatColor=Blue02&mouthType=Twinkle&skinColor=Pale&topType=LongHairCurly",
 ];
 
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default {
   data: () => ({
     active: [],
@@ -124,11 +129,12 @@ export default {
 
   computed: {
     tasks() {
-      return [
-        { text: "Real-Time", icon: "mdi-clock" },
-        { text: "Audience", icon: "mdi-account" },
-        { text: "Conversions", icon: "mdi-flag" },
-      ];
+      if (!this.active.length) return undefined;
+
+      const id = this.active[0];
+
+      console.log(this.users.find((user) => user.id === id));
+      return this.users.find((user) => user.id === id);
     },
     items() {
       return [
@@ -142,6 +148,7 @@ export default {
       if (!this.active.length) return undefined;
 
       const id = this.active[0];
+      console.log(this.users.find((user) => user.id === id));
 
       return this.users.find((user) => user.id === id);
     },
@@ -152,16 +159,29 @@ export default {
   },
 
   methods: {
-    fetchUsers() {
+    fetchUsers(item) {
       // Remove in 6 months and say
       // you've made optimizations! :)
 
-      return [
+      const data = [
         {
           id: 1,
           name: "Leanne Graham",
           username: "Bret",
           email: "Sincere@april.biz",
+          tasks: [
+            { text: "tastk1" },
+            { text: "tastk2" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+            { text: "tastk3" },
+          ],
           address: {
             street: "Kulas Light",
             suite: "Apt. 556",
@@ -181,8 +201,8 @@ export default {
           },
         },
       ];
+      return item.children.push(...data);
     },
-    
     randomAvatar() {
       this.avatar = avatars[Math.floor(Math.random() * avatars.length)];
     },
