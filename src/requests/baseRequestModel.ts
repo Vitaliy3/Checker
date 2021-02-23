@@ -1,6 +1,6 @@
 import axios, {AxiosResponse } from "axios";
 
-class BaseRequestModel {
+export class BaseRequest {
   //todo token
   protected get(url: string): Promise<any> {
     return this.parse(axios.get(url));
@@ -29,4 +29,4 @@ class BaseRequestModel {
   }
 }
 
-export default BaseRequestModel;
+
