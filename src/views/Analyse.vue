@@ -5,22 +5,13 @@
     </v-card-title>
     <v-row class="pa-4" justify="space-between">
       <v-col cols="5">
-        <v-treeview
-          :active.sync="active"
+        <v-data-table
+          :headers="header"
           :items="items"
-          :load-children="fetchUsers"
-          open-all
-          activatable
-          color="warning"
-          open-on-click
-          transition
-        >
-          <template v-slot:prepend="{ item }">
-            <v-icon v-if="!item.children">
-              mdi-account
-            </v-icon>
-          </template>
-        </v-treeview>
+          :items-per-page="5"
+          class="elevation-1"
+          @click:row="handleClick"
+        ></v-data-table>
       </v-col>
 
       <v-divider vertical></v-divider>
@@ -74,40 +65,51 @@
               <h3 class="headline mb-2">
                 {{ selected.name }}
               </h3>
-              <div class="blue--text mb-2">
-                {{ selected.email }}
-              </div>
-              <div class="blue--text subheading font-weight-bold">
-                {{ selected.username }}
-              </div>
             </v-card-text>
             <v-divider></v-divider>
-            <v-row class="text-left" tag="v-card-text">
-              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
-                Company:
-              </v-col>
-              <v-col>{{ selected.company.name }}</v-col>
-              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
-                Website:
-              </v-col>
-              <v-col>
-                <a :href="`//${selected.website}`" target="_blank">{{
-                  selected.website
-                }}</a>
-              </v-col>
-              <v-col class="text-right mr-4 mb-2" tag="strong" cols="5">
-                Phone:
-              </v-col>
-              <v-col>{{ selected.phone }}</v-col>
-            </v-row>
           </v-card>
         </v-scroll-y-transition>
       </v-col>
     </v-row>
+    <v-row>
+      <v-btn
+        color="primary"
+        class="ma-2"
+        dark
+        @click="dialog2 = true"
+        v-if="selected"
+      >
+        Open Dialog 2
+      </v-btn>
+    </v-row>
+
+    <div data-app>
+      <v-dialog v-model="dialog2" max-width="500px">
+        <v-card>
+          <v-card-title>
+            Dialog 2
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              label="Main input"
+              :rules="rules"
+              hide-details="auto"
+              v-on:input="doWhatever($event)"
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn color="primary" text @click="dialog2 = false">
+              Close
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
   </v-card>
 </template>
 
 <script>
+import AnalyseModel from "@/requests/AnalyseModel";
 const avatars = [
   "?accessoriesType=Blank&avatarStyle=Circle&clotheColor=PastelGreen&clotheType=ShirtScoopNeck&eyeType=Wink&eyebrowType=UnibrowNatural&facialHairColor=Black&facialHairType=MoustacheMagnum&hairColor=Platinum&mouthType=Concerned&skinColor=Tanned&topType=Turban",
   "?accessoriesType=Sunglasses&avatarStyle=Circle&clotheColor=Gray02&clotheType=ShirtScoopNeck&eyeType=EyeRoll&eyebrowType=RaisedExcited&facialHairColor=Red&facialHairType=BeardMagestic&hairColor=Red&hatColor=White&mouthType=Twinkle&skinColor=DarkBrown&topType=LongHairBun",
@@ -116,41 +118,49 @@ const avatars = [
   "?accessoriesType=Kurt&avatarStyle=Circle&clotheColor=Gray01&clotheType=BlazerShirt&eyeType=Surprised&eyebrowType=Default&facialHairColor=Red&facialHairType=Blank&graphicType=Selena&hairColor=Red&hatColor=Blue02&mouthType=Twinkle&skinColor=Pale&topType=LongHairCurly",
 ];
 
-const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export default {
   data: () => ({
-    active: [],
     avatar: null,
-    open: [],
-    users: [],
+    selected: [],
+    dialog2: false,
+    rules: [
+      (value) => !!value || "Required.",
+      (value) => (value && value.length >= 3) || "Min 3 characters",
+    ],
     selectedItem: 1,
   }),
 
   computed: {
-    tasks() {
-      if (!this.active.length) return undefined;
+    header() {
+      const header = [
+        {
+          text: "Name",
+          align: "start",
+          sortable: false,
+          value: "name",
+        },
+        { text: "loadDate", value: "loadDate" },
+      ];
 
-      const id = this.active[0];
-
-      console.log(this.users.find((user) => user.id === id));
-      return this.users.find((user) => user.id === id);
+      return header;
     },
     items() {
-      return [
+      const desserts = [
         {
-          name: "Users",
-          children: this.users,
+          id: 1,
+          name: "Frozen Yogurt",
+          loadDate: "2020-01-01",
+          tasks: [{
+            text:'task1'
+          }],
+        },
+        {
+          id: 2,
+          name: "Ice cream sandwich",
+          loadDate: "2020-01-01",
         },
       ];
-    },
-    selected() {
-      if (!this.active.length) return undefined;
-
-      const id = this.active[0];
-      console.log(this.users.find((user) => user.id === id));
-
-      return this.users.find((user) => user.id === id);
+      return desserts;
     },
   },
 
@@ -159,50 +169,16 @@ export default {
   },
 
   methods: {
-    fetchUsers(item) {
-      // Remove in 6 months and say
-      // you've made optimizations! :)
-
-      const data = [
-        {
-          id: 1,
-          name: "Leanne Graham",
-          username: "Bret",
-          email: "Sincere@april.biz",
-          tasks: [
-            { text: "tastk1" },
-            { text: "tastk2" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-            { text: "tastk3" },
-          ],
-          address: {
-            street: "Kulas Light",
-            suite: "Apt. 556",
-            city: "Gwenborough",
-            zipcode: "92998-3874",
-            geo: {
-              lat: "-37.3159",
-              lng: "81.1496",
-            },
-          },
-          phone: "1-770-736-8031 x56442",
-          website: "hildegard.org",
-          company: {
-            name: "Romaguera-Crona",
-            catchPhrase: "Multi-layered client-server neural-net",
-            bs: "harness real-time e-markets",
-          },
-        },
-      ];
-      return item.children.push(...data);
+    handleClick(e) {
+      console.log(typeof this.dialog2);
+      
+      return (this.selected = e);
     },
+
+    doWhatever(event) {
+      console.log(event);
+    },
+
     randomAvatar() {
       this.avatar = avatars[Math.floor(Math.random() * avatars.length)];
     },
