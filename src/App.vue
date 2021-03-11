@@ -45,7 +45,7 @@
           </v-list>
         </v-menu>
 
-        <v-menu open-on-hover offset-y transition="slide-x-transition" offset-x>
+        <v-menu open-on-hover offset-y transition="slide-x-transition">
           <template v-slot:activator="{ on, attrs }">
             <v-btn text v-bind="attrs" v-on="on">
               <v-icon large>mdi-account</v-icon>

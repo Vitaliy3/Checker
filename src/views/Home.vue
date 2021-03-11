@@ -43,4 +43,4 @@ export default class Home extends Vue {
 }
 </script>
 
-<style lang="stylus" scoped></style>
+<style scoped></style>
