@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card style="min-height:100%">
     <v-card-title class="indigo white--text headline">
       User Directory
     </v-card-title>
@@ -46,7 +46,8 @@
             class="title grey--text text--lighten-1 font-weight-light"
             style="align-self: center;"
           >
-            Select a User
+            Выберите один из результатов анализа в таблице для отображения
+            графика
           </div>
           <v-card
             v-else
@@ -59,6 +60,12 @@
               <h3 class="headline mb-2">
                 {{ selected.name }}
               </h3>
+              <apexchart
+                type="line"
+                height="350"
+                :options="chartOptions"
+                :series="series"
+              ></apexchart>
             </v-card-text>
             <v-divider></v-divider>
           </v-card>
@@ -87,15 +94,26 @@
           type="file"
           accept="image/*"
           @change="onFileChanged"
-        >
+        />
       </v-col>
+
       <v-col cols="auto">
         <v-btn
           color="primary"
           class="ma-2"
-          dark
           @click="dialog2 = true"
-          v-if="selected"
+          :disabled="!selected"
+        >
+          Переименовать
+        </v-btn>
+      </v-col>
+
+      <v-col cols="auto">
+        <v-btn
+          color="primary"
+          class="ma-2"
+          @click="dialog2 = true"
+          :disabled="!selected"
         >
           Отправить на почту
         </v-btn>
@@ -105,61 +123,113 @@
         <v-btn
           color="primary"
           class="ma-2"
-          dark
           @click="dialog2 = true"
-          v-if="selected"
+          :disabled="!selected"
         >
           Скачать исходные данные
         </v-btn>
       </v-col>
       <v-col cols="auto">
         <v-btn
+          :disabled="!selected"
           color="primary"
           class="ma-2"
-          dark
           @click="dialog2 = true"
-          v-if="selected"
         >
-          Скачать проанализированные <br> данные
+          Скачать проанализированные <br />
+          данные
         </v-btn>
       </v-col>
     </v-row>
 
     <div data-app>
       <v-col>
-        <v-dialog v-model="dialog2" max-width="500px">
-          <v-card>
-            <v-card-title>
-              Dialog 2
-            </v-card-title>
-            <v-card-text>
-              <v-text-field
-                label="Main input"
-                :rules="rules"
-                hide-details="auto"
-                v-on:input="doWhatever($event)"
-              ></v-text-field>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn color="primary" text @click="dialog2 = false">
-                Close
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <edit-analyse-dialog
+          :dialog="dialog2"
+          v-on:closeEditDialog="toggleHeader($event)"
+        />
       </v-col>
     </div>
   </v-card>
-
 </template>
 
 <script>
 import axios from "axios";
-
+import editAnalyseDialog from "./editAnalyseDialog.vue";
 export default {
+  components: { editAnalyseDialog },
   data: () => ({
+    series: [
+      {
+        name: "Peter",
+        data: [5, 5, 10, 8, 7, 5, 4, null, null, null, 10, 10, 7, 8, 6, 9],
+      },
+      {
+        name: "Johnny",
+        data: [
+          10,
+          15,
+          null,
+          12,
+          null,
+          10,
+          12,
+          15,
+          null,
+          null,
+          12,
+          null,
+          14,
+          null,
+          null,
+          null,
+        ],
+      },
+      {
+        name: "David",
+        data: [
+          null,
+          null,
+          null,
+          null,
+          3,
+          4,
+          1,
+          3,
+          4,
+          6,
+          7,
+          9,
+          5,
+          null,
+          null,
+          null,
+        ],
+      },
+    ],
+    chartOptions: {
+      chart: {
+        height: 350,
+        type: "line",
+        zoom: {
+          enabled: false,
+        },
+        animations: {
+          enabled: false,
+        },
+      },
+      stroke: {
+        width: [5, 5, 4],
+        curve: "straight",
+      },
+      labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+      title: {
+        text: "Missing data (null values)",
+      },
+      xaxis: {},
+    },
     prevSelectedRow: null,
-    selected: [],
+    selected: null,
     dialog2: false,
     defaultButtonText: "Загрузить данные", // текст по умолчанию на кнопке загрузки файла
     selectedFile: null, // выбранный загружаемый файл
@@ -167,15 +237,17 @@ export default {
 
     rules: [
       (value) => !!value || "Required.",
-      (value) => (value && value.length >= 3) || "Min 3 characters"
+      (value) => (value && value.length >= 3) || "Min 3 characters",
     ],
-    selectedItem: 1
+    selectedItem: 1,
   }),
 
   computed: {
     // текст на кпопке загрузки файла после выбора файла
     buttonText() {
-      return this.selectedFile ? this.selectedFile.name : this.defaultButtonText;
+      return this.selectedFile
+        ? this.selectedFile.name
+        : this.defaultButtonText;
     },
 
     header() {
@@ -184,9 +256,9 @@ export default {
           text: "Name",
           align: "start",
           sortable: false,
-          value: "name"
+          value: "name",
         },
-        { text: "loadDate", value: "loadDate" }
+        { text: "loadDate", value: "loadDate" },
       ];
 
       return header;
@@ -197,28 +269,37 @@ export default {
           id: 1,
           name: "Frozen Yogurt",
           loadDate: "2020-01-01",
-          tasks: [{
-            text: "task1"
-          }]
+          tasks: [
+            {
+              text: "task1",
+            },
+          ],
         },
         {
           id: 2,
           name: "Ice cream sandwich",
-          loadDate: "2020-01-01"
-        }
+          loadDate: "2020-01-01",
+        },
       ];
       return desserts;
-    }
+    },
   },
 
-
   methods: {
+    toggleHeader(event) {
+      this.dialog2=false
+      console.log(event);
+    },
     // метод по нажатию на кнопку загрузки файла
     onButtonClick() {
       this.isSelecting = true;
-      window.addEventListener("focus", () => {
-        this.isSelecting = false;
-      }, { once: true });
+      window.addEventListener(
+        "focus",
+        () => {
+          this.isSelecting = false;
+        },
+        { once: true }
+      );
 
       this.$refs.uploader.click();
     },
@@ -240,8 +321,7 @@ export default {
 
     doWhatever(event) {
       console.log(event);
-    }
-
-  }
+    },
+  },
 };
 </script>
