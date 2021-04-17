@@ -154,59 +154,11 @@
 </template>
 
 <script>
-import axios from "axios";
-import editAnalyseDialog from "./editAnalyseDialog.vue";
+import axios from "axios"
+import editAnalyseDialog from "./editAnalyseDialog.vue"
 export default {
   components: { editAnalyseDialog },
   data: () => ({
-    series: [
-      {
-        name: "Peter",
-        data: [5, 5, 10, 8, 7, 5, 4, null, null, null, 10, 10, 7, 8, 6, 9],
-      },
-      {
-        name: "Johnny",
-        data: [
-          10,
-          15,
-          null,
-          12,
-          null,
-          10,
-          12,
-          15,
-          null,
-          null,
-          12,
-          null,
-          14,
-          null,
-          null,
-          null,
-        ],
-      },
-      {
-        name: "David",
-        data: [
-          null,
-          null,
-          null,
-          null,
-          3,
-          4,
-          1,
-          3,
-          4,
-          6,
-          7,
-          9,
-          5,
-          null,
-          null,
-          null,
-        ],
-      },
-    ],
     chartOptions: {
       chart: {
         height: 350,
@@ -219,8 +171,9 @@ export default {
         },
       },
       stroke: {
-        width: [5, 5, 4],
+        width: [1, 1, 1],
         curve: "straight",
+        dashArray: [0, 0, 2],
       },
       labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
       title: {
@@ -243,11 +196,52 @@ export default {
   }),
 
   computed: {
+    series() {
+      const bData = []
+      for (let i = 8; i < 12; i++) {
+        bData.push(Math.pow(i, 2) / 8)
+      }
+      console.log(bData)
+      return [
+        {
+          name: "B+",
+          data: [null, null, null, null, ...bData],
+        },
+        {
+          name: "B-",
+          data: [5, 5, 10, 8, 7, 5, 4],
+        },
+        {
+          name: "my1",
+          data: [2, 3, 4, 5],
+        },
+        {
+          name: "my2",
+          data: [
+            null,
+            null,
+            null,
+            null,
+            3,
+            4,
+            1,
+            3,
+            4,
+            6,
+            7,
+            9,
+            5,
+            null,
+            null,
+            null,
+          ],
+        },
+      ]
+    },
+
     // текст на кпопке загрузки файла после выбора файла
     buttonText() {
-      return this.selectedFile
-        ? this.selectedFile.name
-        : this.defaultButtonText;
+      return this.selectedFile ? this.selectedFile.name : this.defaultButtonText
     },
 
     header() {
@@ -259,9 +253,9 @@ export default {
           value: "name",
         },
         { text: "loadDate", value: "loadDate" },
-      ];
+      ]
 
-      return header;
+      return header
     },
     items() {
       const desserts = [
@@ -280,48 +274,48 @@ export default {
           name: "Ice cream sandwich",
           loadDate: "2020-01-01",
         },
-      ];
-      return desserts;
+      ]
+      return desserts
     },
   },
 
   methods: {
     toggleHeader(event) {
-      this.dialog2=false
-      console.log(event);
+      this.dialog2 = false
+      console.log(event)
     },
     // метод по нажатию на кнопку загрузки файла
     onButtonClick() {
-      this.isSelecting = true;
+      this.isSelecting = true
       window.addEventListener(
         "focus",
         () => {
-          this.isSelecting = false;
+          this.isSelecting = false
         },
         { once: true }
-      );
+      )
 
-      this.$refs.uploader.click();
+      this.$refs.uploader.click()
     },
     // метод,который срабатывает после выбора файла
     onFileChanged(e) {
-      this.selectedFile = e.target.files[0];
+      this.selectedFile = e.target.files[0]
 
-      const formData = new FormData();
-      formData.append("file", this.selectedFile);
-      axios.post("google.com", formData);
+      const formData = new FormData()
+      formData.append("file", this.selectedFile)
+      axios.post("google.com", formData)
     },
 
     analyseRowClick(e, row) {
-      if (this.prevSelectedRow) this.prevSelectedRow.select(false);
-      this.prevSelectedRow = row;
-      row.select(true);
-      return (this.selected = e);
+      if (this.prevSelectedRow) this.prevSelectedRow.select(false)
+      this.prevSelectedRow = row
+      row.select(true)
+      return (this.selected = e)
     },
 
     doWhatever(event) {
-      console.log(event);
+      console.log(event)
     },
   },
-};
+}
 </script>

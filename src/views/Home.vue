@@ -16,14 +16,14 @@
 </template>
 
 <script lang="ts">
-import Component from "vue-class-component";
-import { Watch } from "vue-property-decorator";
-import Vue from "vue";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
-import { ValidationProvider, extend } from "vee-validate";
+import Component from "vue-class-component"
+import { Watch } from "vue-property-decorator"
+import Vue from "vue"
+import HelloWorld from "@/components/HelloWorld.vue" // @ is an alias to /src
+import { ValidationProvider, extend } from "vee-validate"
 extend("positive", (value) => {
-  return value.length > 3;
-});
+  return value.length > 3
+})
 
 @Component({
   components: {
@@ -32,12 +32,12 @@ extend("positive", (value) => {
   },
 })
 export default class Home extends Vue {
-  email: string = "";
-  name: string = "email";
+  email: string = ""
+  name: string = "email"
   @Watch("email")
   async onEmailChanged(val: any) {
     if (val) {
-      console.log(val);
+      console.log(val)
     }
   }
 }

@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  props:['dialog'],
+  props: ["dialog"],
   data: () => ({
     rules: [
       (value) => !!value || "Required.",
@@ -34,8 +34,8 @@ export default {
   computed: {},
 
   methods: {
-    close(){
-      this.$emit('closeEditDialog','false')
+    close() {
+      this.$emit("closeEditDialog", "false");
     },
     confirmEdit(event) {
       console.log(event);
