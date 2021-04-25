@@ -1,5 +1,5 @@
 export class Comment {
-  private baseModel
+  //private baseModel
   private id: number
   private user: Account
   private message: string

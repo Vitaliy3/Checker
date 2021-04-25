@@ -1,13 +1,13 @@
 <template>
   <v-card style="min-height:100%">
     <v-card-title class="indigo white--text headline">
-      User Directory
+      Анализ результатов тестирования
     </v-card-title>
     <v-row class="pa-4" justify="space-between">
       <v-col cols="5">
         <v-data-table
           :headers="header"
-          :items="items"
+          :items="banks"
           :items-per-page="5"
           class="elevation-1"
           @click:row="analyseRowClick"
@@ -18,19 +18,23 @@
 
       <v-col cols="3">
         <div
-          v-if="!selected"
+          v-if="!selectedBank"
           class="title grey--text text--lighten-1 font-weight-light"
-          style="align-self: center;"
+          style="text-align: center;margin-top:50px"
         >
-          Select a User
+          Выберите один из результатов тестирования для отображения заданий
         </div>
-        <v-list v-else :key="selected.id" flat>
-          <v-subheader>REPORTS</v-subheader>
+        <v-list v-else :key="selectedBank.id" flat>
+          <v-subheader>Задания</v-subheader>
           <v-list-item-group v-model="selectedItem" color="primary">
-            <v-list-item v-for="(item, i) in selected.tasks" :key="i">
+            <v-list-item
+              v-for="(item, i) in tasks"
+              :key="i"
+              @click="ClickOnTask(selectedBank.id, item.id)"
+            >
               <v-list-item-icon></v-list-item-icon>
               <v-list-item-content>
-                <v-list-item-title v-text="item.text"></v-list-item-title>
+                <v-list-item-title v-text="item.id"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -41,25 +45,16 @@
 
       <v-col class="d-flex text-center">
         <v-scroll-y-transition mode="out-in">
-          <div
-            v-if="!selected"
+          <!-- <div
+            v-if="!selectedTask"
             class="title grey--text text--lighten-1 font-weight-light"
             style="align-self: center;"
           >
-            Выберите один из результатов анализа в таблице для отображения
-            графика
-          </div>
-          <v-card
-            v-else
-            :key="selected.id"
-            class="pt-6 mx-auto"
-            flat
-            max-width="400"
-          >
+            Выберите одно из заданий в таблице для отображения графика
+          </div> -->
+          <v-card class="pt-6 mx-auto" flat max-width="400">
             <v-card-text>
-              <h3 class="headline mb-2">
-                {{ selected.name }}
-              </h3>
+              <h3 class="headline mb-2"></h3>
               <apexchart
                 type="line"
                 height="350"
@@ -73,75 +68,77 @@
       </v-col>
     </v-row>
 
-    <v-row>
-      <v-col cols="auto">
-        <v-btn
-          color="primary"
-          class="ma-2"
-          instead
-          depressed
-          :loading="isSelecting"
-          @click="onButtonClick"
-        >
-          <v-icon left>
-            cloud_upload
-          </v-icon>
-          {{ buttonText }}
-        </v-btn>
-        <input
-          ref="uploader"
-          class="d-none"
-          type="file"
-          accept="image/*"
-          @change="onFileChanged"
-        />
-      </v-col>
+    <div class="buttons">
+      <v-row>
+        <v-col cols="auto">
+          <v-btn
+            color="primary"
+            class="ma-2"
+            instead
+            depressed
+            :loading="isSelecting"
+            @click="onButtonClick"
+          >
+            <v-icon left>
+              cloud_upload
+            </v-icon>
+            {{ buttonText }}
+          </v-btn>
+          <input
+            ref="uploader"
+            class="d-none"
+            type="file"
+            accept="image/*"
+            @change="onFileChanged"
+          />
+        </v-col>
 
-      <v-col cols="auto">
-        <v-btn
-          color="primary"
-          class="ma-2"
-          @click="dialog2 = true"
-          :disabled="!selected"
-        >
-          Переименовать
-        </v-btn>
-      </v-col>
+        <v-col cols="auto">
+          <v-btn
+            color="primary"
+            class="ma-2"
+            @click="dialog2 = true"
+            :disabled="!selectedBank"
+          >
+            Переименовать
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="auto">
+          <v-btn
+            color="primary"
+            class="ma-2"
+            @click="dialog2 = true"
+            :disabled="!selectedBank"
+          >
+            Отправить на почту
+          </v-btn>
+        </v-col>
 
-      <v-col cols="auto">
-        <v-btn
-          color="primary"
-          class="ma-2"
-          @click="dialog2 = true"
-          :disabled="!selected"
-        >
-          Отправить на почту
-        </v-btn>
-      </v-col>
-
-      <v-col cols="auto">
-        <v-btn
-          color="primary"
-          class="ma-2"
-          @click="dialog2 = true"
-          :disabled="!selected"
-        >
-          Скачать исходные данные
-        </v-btn>
-      </v-col>
-      <v-col cols="auto">
-        <v-btn
-          :disabled="!selected"
-          color="primary"
-          class="ma-2"
-          @click="dialog2 = true"
-        >
-          Скачать проанализированные <br />
-          данные
-        </v-btn>
-      </v-col>
-    </v-row>
-
+        <v-col cols="auto">
+          <v-btn
+            color="primary"
+            class="ma-2"
+            @click="downloadRawBank"
+            :disabled="!selectedBank"
+          >
+            Скачать исходные данные
+          </v-btn>
+        </v-col>
+        <v-col cols="auto">
+          <v-btn
+            :disabled="!selectedBank"
+            color="primary"
+            class="ma-2"
+            @click="downloadAnalysedBank"
+          >
+            Скачать проанализированные <br />
+            данные
+          </v-btn>
+        </v-col>
+      </v-row>
+    </div>
     <div data-app>
       <v-col>
         <edit-analyse-dialog
@@ -150,39 +147,77 @@
         />
       </v-col>
     </div>
+    <div class="message"></div>
+    <FlashMessage></FlashMessage>
   </v-card>
 </template>
 
 <script>
+import Vue from "vue"
+import FlashMessage from "@smartweb/vue-flash-message"
+Vue.use(FlashMessage)
 import axios from "axios"
 import editAnalyseDialog from "./editAnalyseDialog.vue"
+import Analyse, { Task } from "@/entities/analyse"
 export default {
   components: { editAnalyseDialog },
   data: () => ({
+    banks: [],
     chartOptions: {
       chart: {
         height: 350,
         type: "line",
         zoom: {
-          enabled: false,
+          enabled: true,
         },
         animations: {
-          enabled: false,
+          enabled: true,
         },
       },
       stroke: {
-        width: [1, 1, 1],
+        width: [1, 1, 2, 2],
         curve: "straight",
-        dashArray: [0, 0, 2],
+        dashArray: [2, 2, 4, 0],
       },
-      labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-      title: {
-        text: "Missing data (null values)",
+
+      xaxis: {
+        type: "numeric",
+
+        categories: [
+          -2,
+          -1.75,
+          -1.5,
+          -1.25,
+          -1,
+          -0.75,
+          -0.5,
+          -0.25,
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1,
+          1.25,
+          1.5,
+          1.75,
+          2,
+        ],
+
+        title: {
+          text: "Уровень сложности",
+        },
       },
-      xaxis: {},
+      yaxis: {
+        title: {
+          text: "Уровень подготовленности",
+        },
+      },
     },
+
     prevSelectedRow: null,
-    selected: null,
+    selectedBank: null,
+    selectedTask: null,
+    tasks: [],
     dialog2: false,
     defaultButtonText: "Загрузить данные", // текст по умолчанию на кнопке загрузки файла
     selectedFile: null, // выбранный загружаемый файл
@@ -192,28 +227,77 @@ export default {
       (value) => !!value || "Required.",
       (value) => (value && value.length >= 3) || "Min 3 characters",
     ],
-    selectedItem: 1,
+    selectedItem: null,
   }),
 
   computed: {
     series() {
-      const bData = []
-      for (let i = 8; i < 12; i++) {
-        bData.push(Math.pow(i, 2) / 8)
-      }
-      console.log(bData)
       return [
         {
           name: "B+",
-          data: [null, null, null, null, ...bData],
+          data: [
+            0.25,
+            0.3,
+            0.37,
+            0.43,
+            0.48,
+            0.53,
+            0.56,
+            0.63,
+            0.7,
+            0.73,
+            0.79,
+            0.85,
+            1,
+            1.25,
+            null,
+            null,
+            null,
+          ],
         },
         {
           name: "B-",
-          data: [5, 5, 10, 8, 7, 5, 4],
+          data: [
+            0.05,
+            0.1,
+            0.17,
+            0.23,
+            0.28,
+            0.33,
+            0.36,
+            0.43,
+            0.5,
+            0.53,
+            0.59,
+            0.65,
+            0.75,
+            0.9,
+            null,
+            null,
+            null,
+          ],
         },
         {
           name: "my1",
-          data: [2, 3, 4, 5],
+          data: [
+            0.09,
+            0.2,
+            0.27,
+            0.33,
+            0.38,
+            0.43,
+            0.46,
+            0.53,
+            0.6,
+            0.63,
+            0.69,
+            0.75,
+            0.9,
+            1.05,
+            null,
+            null,
+            null,
+          ],
         },
         {
           name: "my2",
@@ -222,15 +306,16 @@ export default {
             null,
             null,
             null,
-            3,
-            4,
-            1,
-            3,
-            4,
-            6,
-            7,
-            9,
-            5,
+            0.6,
+            0.5,
+            0.4,
+            0.25,
+            0.3,
+            0.3,
+            0,
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -246,43 +331,40 @@ export default {
 
     header() {
       const header = [
-        {
-          text: "Name",
-          align: "start",
-          sortable: false,
-          value: "name",
-        },
-        { text: "loadDate", value: "loadDate" },
+        { text: "Название бтз", sortable: true, value: "name" },
+        { text: "Дата загрузки", value: "loadDate" },
+        { text: "Кол-во тестируемых", value: "countUsers" },
+        { text: "Кол-во заданий", value: "countTasks" },
+        { text: "Статус анализа", value: "status" },
       ]
 
       return header
     },
-    items() {
-      const desserts = [
-        {
-          id: 1,
-          name: "Frozen Yogurt",
-          loadDate: "2020-01-01",
-          tasks: [
-            {
-              text: "task1",
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: "Ice cream sandwich",
-          loadDate: "2020-01-01",
-        },
-      ]
-      return desserts
-    },
+  },
+  created() {
+    const model = new Analyse()
+
+    model.getAllBanks().then((data) => {
+      this.banks = data
+    })
   },
 
   methods: {
+    downloadRawBank() {
+      console.log("ddd")
+    },
+    downloadAnalysedBank() {
+      console.log("ddd")
+    },
+    ClickOnTask(bankId, taskId) {
+      this.tasks.find((task) => {
+        if (task.id == taskId) {
+          this.selectedTask = task
+        }
+      })
+    },
     toggleHeader(event) {
       this.dialog2 = false
-      console.log(event)
     },
     // метод по нажатию на кнопку загрузки файла
     onButtonClick() {
@@ -307,10 +389,22 @@ export default {
     },
 
     analyseRowClick(e, row) {
+      this.flashMessage.show({
+        status: "error",
+        title: "Error Message Title",
+        message: "Oh, you broke my heart! Shame on you!",
+      })
+
       if (this.prevSelectedRow) this.prevSelectedRow.select(false)
       this.prevSelectedRow = row
       row.select(true)
-      return (this.selected = e)
+
+      const taskModel = new Task()
+      taskModel.getTasksByBankId(1).then((data) => {
+        this.tasks = data
+      })
+
+      return (this.selectedBank = e)
     },
 
     doWhatever(event) {
@@ -319,3 +413,9 @@ export default {
   },
 }
 </script>
+<style lang="css">
+.buttons {
+  position: absolute;
+  bottom: 0;
+}
+</style>

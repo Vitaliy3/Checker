@@ -1,6 +1,7 @@
 module.exports = {
   root: true,
   env: {
+    es6: true,
     node: true,
   },
   extends: [
@@ -12,7 +13,7 @@ module.exports = {
   ],
 
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 6,
   },
   rules: {
     "@typescript-eslint/no-inferrable-types": "off",
