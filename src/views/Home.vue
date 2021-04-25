@@ -51,6 +51,9 @@ export default {
     countTasks: 10,
     countSuspiciousTasks: 10,
   }),
+  mounted() {
+    console.log(typeof this, this.countSuspiciousTasks)
+  },
 }
 </script>
 

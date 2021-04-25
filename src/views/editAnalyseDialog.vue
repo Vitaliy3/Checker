@@ -1,9 +1,7 @@
 <template>
   <v-dialog :value="dialog" persistent max-width="500px">
     <v-card>
-      <v-card-title>
-        Dialog 22
-      </v-card-title>
+      <v-card-title> </v-card-title>
       <v-card-text>
         <v-text-field
           label="Main input"
@@ -14,6 +12,9 @@
       </v-card-text>
       <v-card-actions>
         <v-btn color="primary" text @click="close()">
+          Ок
+        </v-btn>
+        <v-btn color="primary" text @click="send()">
           Close
         </v-btn>
       </v-card-actions>
@@ -34,12 +35,15 @@ export default {
   computed: {},
 
   methods: {
+    send() {
+      this.$emit("closeEditDialog1", "false")
+    },
     close() {
-      this.$emit("closeEditDialog", "false");
+      this.$emit("closeEditDialog", "false")
     },
     confirmEdit(event) {
-      console.log(event);
+      console.log(event)
     },
   },
-};
+}
 </script>

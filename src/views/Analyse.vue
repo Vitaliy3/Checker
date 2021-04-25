@@ -4,7 +4,7 @@
       Анализ результатов тестирования
     </v-card-title>
     <v-row class="pa-4" justify="space-between">
-      <v-col cols="5">
+      <v-col cols="6">
         <v-data-table
           :headers="header"
           :items="banks"
@@ -45,13 +45,13 @@
 
       <v-col class="d-flex text-center">
         <v-scroll-y-transition mode="out-in">
-          <!-- <div
+          <div
             v-if="!selectedTask"
             class="title grey--text text--lighten-1 font-weight-light"
             style="align-self: center;"
           >
             Выберите одно из заданий в таблице для отображения графика
-          </div> -->
+          </div>
           <v-card class="pt-6 mx-auto" flat max-width="400">
             <v-card-text>
               <h3 class="headline mb-2"></h3>
@@ -204,12 +204,12 @@ export default {
         ],
 
         title: {
-          text: "Уровень сложности",
+          text: "Уровень подготовленности",
         },
       },
       yaxis: {
         title: {
-          text: "Уровень подготовленности",
+          text: "частота удачного выполнения задания ",
         },
       },
     },
@@ -278,7 +278,7 @@ export default {
           ],
         },
         {
-          name: "my1",
+          name: "Бинрбаум",
           data: [
             0.09,
             0.2,
@@ -300,7 +300,7 @@ export default {
           ],
         },
         {
-          name: "my2",
+          name: "Вероятность",
           data: [
             null,
             null,
@@ -364,6 +364,10 @@ export default {
       })
     },
     toggleHeader(event) {
+      this.flashMessage.success({
+        title: "Уведомление",
+        message: "Действие выполнено успешно",
+      })
       this.dialog2 = false
     },
     // метод по нажатию на кнопку загрузки файла

@@ -4,18 +4,44 @@ export default class Analyse {
   private status: string
   private loadDate: Date
   private tasks: Task[]
+  private countUsers: number
+  private countTasks: number
 
-  constructor(id: number, name: string, status: string, loadDate: Date) {
+  constructor(
+    id: number,
+    name: string,
+    status: string,
+    loadDate: Date,
+    users: number,
+    task: number
+  ) {
     this.id = id
     this.name = name
     this.status = status
     this.loadDate = loadDate
+    this.countTasks = task
+    this.countUsers = users
   }
 
   private getAllBanks(): Promise<Analyse[]> {
     return new Promise((res) => {
-      const analyse: Analyse = new Analyse(1, "b1", "ok", new Date())
-      res([analyse])
+      const analyse: Analyse = new Analyse(
+        1,
+        "Тест по истории",
+        "Успех",
+        new Date(),
+        5,
+        4
+      )
+      const analyse1: Analyse = new Analyse(
+        2,
+        "Тест по математике",
+        "Успех",
+        new Date(),
+        41,
+        36
+      )
+      res([analyse, analyse1])
     })
   }
   // private sendByEmail(bankId: number, email: string): Promise<boolean> {
@@ -59,9 +85,9 @@ export class Task {
   private getTasksByBankId(id: number): Promise<Task[]> {
     return new Promise((res) => {
       const tasks: Task[] = []
-      tasks.push(new Task(1, [1], [1], [1], [1]))
-      tasks.push(new Task(2, [2], [1], [1], [1]))
-      tasks.push(new Task(3, [3], [1], [1], [1]))
+      tasks.push(new Task(9944482, [1], [1], [1], [1]))
+      tasks.push(new Task(2324213, [2], [1], [1], [1]))
+      tasks.push(new Task(3421342, [3], [1], [1], [1]))
 
       res(tasks)
     })
